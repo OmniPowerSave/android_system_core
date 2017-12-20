@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "libsuspend"
-
 #include <stdbool.h>
 
-#include <log/log.h>
+#define LOG_TAG "libsuspend"
+#include <cutils/log.h>
 
 #include <suspend/autosuspend.h>
 
@@ -34,25 +33,38 @@ static int autosuspend_init(void)
         return 0;
     }
 
+#if 0
     autosuspend_ops = autosuspend_earlysuspend_init();
     if (autosuspend_ops) {
         goto out;
     }
+#endif
 
+/* Remove autosleep so userspace can manager suspend/resume and keep stats */
+#if 1
+    autosuspend_ops = autosuspend_autosleep_init();
+    if (autosuspend_ops) {
+        goto out;
+    }
+#endif
+
+#if 0
     autosuspend_ops = autosuspend_wakeup_count_init();
     if (autosuspend_ops) {
         goto out;
     }
 
+#endif
+
     if (!autosuspend_ops) {
-        ALOGE("failed to initialize autosuspend\n");
+        ALOGE("autosuspend: failed to initialize autosuspend\n");
         return -1;
     }
 
 out:
     autosuspend_inited = true;
 
-    ALOGV("autosuspend initialized\n");
+    ALOGV("autosuspend: autosuspend initialized\n");
     return 0;
 }
 
@@ -65,7 +77,7 @@ int autosuspend_enable(void)
         return ret;
     }
 
-    ALOGV("autosuspend_enable\n");
+    ALOGV("autosuspend: autosuspend_enable\n");
 
     if (autosuspend_enabled) {
         return 0;
@@ -89,7 +101,7 @@ int autosuspend_disable(void)
         return ret;
     }
 
-    ALOGV("autosuspend_disable\n");
+    ALOGV("autosuspend: autosuspend_disable\n");
 
     if (!autosuspend_enabled) {
         return 0;
